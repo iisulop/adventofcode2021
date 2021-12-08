@@ -5,8 +5,8 @@ use std::path::PathBuf;
 use std::str::FromStr;
 
 use log::info;
-use structopt::StructOpt;
 use structopt;
+use structopt::StructOpt;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -52,9 +52,25 @@ pub fn read_input_lines_usize(filepath: &PathBuf) -> Vec<usize> {
         .map(|i| usize::from_str(&i.unwrap()).unwrap())
         .collect()
 }
+pub fn read_input_lines_string(filepath: &PathBuf) -> Vec<String> {
+    BufReader::new(File::open(filepath).unwrap())
+        .lines()
+        .collect::<Result<Vec<String>, _>>()
+        .unwrap()
+}
+
+pub fn run<T: Display>(p1: fn(&PathBuf) -> T, p2: fn(&PathBuf) -> T) {
+    let opt = init();
+    if opt.part == 1 {
+        let result_part1 = p1(&opt.infile);
+        println!("Part 1: {}", result_part1);
+    } else if opt.part == 2 {
+        let result_part2 = p2(&opt.infile);
+        println!("Part 2: {}", result_part2);
+    }
+}
 
 pub fn init() -> Opt {
     env_logger::init();
-    let opt = Opt::from_args();
-    opt
+    Opt::from_args()
 }
